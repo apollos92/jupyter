@@ -1,33 +1,70 @@
 # Python / Jupyter Notebook 설치
 
-## 개요
+## Python 준비
 
-## Python 설치
+### Windows / MacOS
 
-### yum 활용
+> 2017-05-19 현재 최신버전: `3.6.1`
+
+- 공식 다운로드 페이지: https://www.python.org/downloads/release/python-361/
+
+- 다운로드 후 패키지 설치 (관리자 권한 필요)
+
+
+### 리눅스
+
+> `root`, 또는 `sudo` 활용해 관리자 권한으로 설치
+
+#### 바이너리 패키지 설치
+
+> 리눅스 CentOS7 기준, `yum` 패키지 관리자 사용
+> - 2017-05-19 현재 `EPEL` 등록 최신 버전: `3.4`
 
 ```
-sudo yum install epel-release
+yum install epel-release
 ```
 
 ```
-sudo yum install python34
-
+yum install python34
 ```
 
+#### 참고: 최신 버전 설치 
 
-### 패키지 관리자 (pip) 설치
+> 소스 `tar` 이미지 다운, 직접 컴파일 필요
 
-To install pip and setuptools, you need to install them separately as follows.
+- 개발 패키지 설치
 
+```
+yum -y install zlib-devel
+```
+
+- 소스 다운 및 컴파일
+
+> 2017-05-19 현재 최신버전: `3.6.1`
+
+```
+wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tar.xz
+tar xJf Python-3.6.0.tar.xz
+cd Python-3.6.0
+./configure
+make
+make install
+```
+
+## 모듈 관리자 (pip) 설치
+
+- 아래와 같이 pip 설치용 파이썬 파일을 다운받아, `pip` 설치
+
+> `pip` 활용, 나머지 필요 모듈 (`pandas`, `jupyter` 및 의존 모듈) 설치
+
+```
 curl -O https://bootstrap.pypa.io/get-pip.py
 sudo /usr/bin/python3.4 get-pip.py
+```
 
+## 필요 모듈 설치
 
-## 연동 모듈 설치
-
-### 의존 패키지 설치
-
+### Data Frame 모듈 설치 (`pandas`)
 
 ``` bash
 pip3 install pandas
@@ -51,9 +88,9 @@ Installing collected packages: numpy, python-dateutil, pytz, pandas
 Successfully installed numpy-1.12.1 pandas-0.20.1 python-dateutil-2.6.0 pytz-2017.2
 ```
 
-## Jupyter Notebook 준비
+# Jupyter Notebook 준비
 
-### 설치
+## 설치
 
 ``` bash
 pip3 install jupyter
@@ -68,41 +105,61 @@ Successfully installed MarkupSafe-1.0 backports-abc-0.5 bleach-2.0.0 decorator-4
 ```
 
 
-### 환경 설정
+## 환경 설정
+
+### 환경 디렉터리 확인 (변경)
 
 - 기본 환경 디렉터리: `~/.jupyter`
 
-- 환경 디렉터리 변경: `JUPYTER_CONFIG_DIR` 환경 변수 등록
+- 환경 디렉터리 변경: `.bash_profile` 등 계정 환경설정에 `JUPYTER_CONFIG_DIR` 환경 변수 등록
 
 ``` bash
-
+...
+JUPYTER_CONFIG_DIR = [환경변수 디렉터리]
+...
+export JUPYTER_CONFIG_DIR
 ```
 
-- 노트북 문서 디렉터리 설정: `JUPYTER_PATH` 환경 변수에 OS별 디렉터리 구분자 활용, 추가
+### 설정파일 생성/수정
 
-``` bash
-```
 
-### 설정파일 생성
+#### 생성 (`jupyter_notebook_config.py`)
 
-- Notebook
+- 환경 디렉터리 이동 후, 다음 명령 실행 
 
 ```
 jupyter notebook --generate-config
 ```
 
-- `JUPYTER_CONFIG_DIR` 디렉터리 안에 `jupyter_notebook_config.py` 파일 생성
+- `jupyter_notebook_config.py` 파일 생성됨 확인
 
-### 원격 접속 관련
+#### 설정파일 수정 
 
-#### password 설정
+- `jupyter_notebook_config.py` 수정
 
-- Password 생성
+- 예: 노트북 파일 (`.ipynb`) 홈 디렉터리 수정
+
+``` python
+...
+c.NotebookApp.notebook_dir = '/usr/local/share/jupyter'
+```
+
+- 예: 임의 IP의 원격 접속 허용 (보안 이슈 있으므로, 신중히 선택)
+
+``` python
+...
+c.NotebookApp.ip = '*'
+```
+
+#### password 설정 (원격 접속시 반드시 필요)
+
+- Python REPL 에서 패스워드 생성 명령 실행
 
 ``` python
 from notebook.auth import passwd
 passwd()
 ```
+- 패스워드 입력 후 암호화된 문자열 확인
 
 ```
 Enter password:
@@ -110,32 +167,38 @@ Verify password:
 'sha1:...'
 ```
 
-- `'sha1:...'` 영역을 복사, 생성한 설정파일 내 다음 항목 수정
-
-> `jupyter_notebook_config.py` 파일 설정
+- 암호화된 `'sha1:...'` 영역을 복사, 생성한 설정파일 내 다음 항목 수정
 
 ``` python
 ...
-c.NotebookApp.ip = '*'
-c.NotebookApp.password = u'sha1:...'
-c.NotebookApp.notebook_dir = u'/usr/local/share/jupyter'
+c.NotebookApp.password = 'sha1:...'
+...
 ```
-
 
 ## 실행
 
-### 기본 명령
+### 기본 실행 명령
 
 ```
 jupyter notebook
 ```
 
-- 기본적으로 http://localhost:8888 에 대한 기본 브라우저 페이지 띄움 (띄울수 없으면 WARN 메시지)
+> http://localhost:8888 에 대한 기본 브라우저 페이지 띄움 (띄울수 없으면 WARN 메시지)
 
-### 실행 옵션
-
-#### 기본 페이지 띄우지 않음
+### 브라우저 띄우지 않고 실행
 
 ```
 jupyter notebook --no-browser
 ```
+
+### 백그라운드 실행 
+
+```
+nohup jupyter notebook --no-browser  1>/dev/null 2>/var/log/jupyter/jupyter.log &
+```
+
+### 페이지 접속
+
+`http://[호스트 주소]:8888`
+
+> 접속 후 미리 설정한 암호 입력하면, 노트북 목록 페이지로 이동함
