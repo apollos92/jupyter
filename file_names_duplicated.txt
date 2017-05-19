@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+Python-Introduction-2.ipynb
+Python-Introduction-1.ipynb
+python-module.html
+file_names.txt
+file_names_duplicated.txt
+python-setup.md
+python-module.md
